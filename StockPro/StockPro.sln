@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockMovementService", "Sto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlertService", "AlertService\AlertService.csproj", "{FA3B6162-F6E0-4265-B1D8-4A8DF205604E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportService", "ReportService\ReportService.csproj", "{A85B4243-A35F-4F9F-95E8-5C89CF602541}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,18 @@ Global
 		{FA3B6162-F6E0-4265-B1D8-4A8DF205604E}.Release|x64.Build.0 = Release|Any CPU
 		{FA3B6162-F6E0-4265-B1D8-4A8DF205604E}.Release|x86.ActiveCfg = Release|Any CPU
 		{FA3B6162-F6E0-4265-B1D8-4A8DF205604E}.Release|x86.Build.0 = Release|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Debug|x64.Build.0 = Debug|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Debug|x86.Build.0 = Debug|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Release|x64.ActiveCfg = Release|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Release|x64.Build.0 = Release|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Release|x86.ActiveCfg = Release|Any CPU
+		{A85B4243-A35F-4F9F-95E8-5C89CF602541}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
