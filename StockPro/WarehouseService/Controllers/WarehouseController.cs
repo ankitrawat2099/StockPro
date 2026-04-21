@@ -37,7 +37,7 @@ public class WarehouseController : ControllerBase
         var result = await _service.GetAllWarehousesAsync();
         return Ok(result);
     }
-
+    [AllowAnonymous]
     [HttpGet("warehouses/{id}")]
     public async Task<IActionResult> GetWarehouse(int id)
     {
@@ -109,7 +109,7 @@ public class WarehouseController : ControllerBase
 
         return Ok("Stock transferred");
     }
-
+[AllowAnonymous]
     [HttpGet("stock/low")]
     public async Task<IActionResult> GetLowStock()
     {

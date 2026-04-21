@@ -29,7 +29,7 @@ public class ProductController : ControllerBase
     }
 
     //get by id
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
