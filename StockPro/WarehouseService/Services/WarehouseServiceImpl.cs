@@ -1,12 +1,60 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+
 public class WarehouseServiceImpl : IWarehouseService
 {
     private readonly IWarehouseRepository _repository;
     private readonly WarehouseDbContext _context;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IConfiguration _configuration;
 
-    public WarehouseServiceImpl(IWarehouseRepository repository, WarehouseDbContext context)
+    public WarehouseServiceImpl(
+        IWarehouseRepository repository,
+        WarehouseDbContext context,
+        IHttpClientFactory httpClientFactory,
+        IHttpContextAccessor httpContextAccessor,
+        IConfiguration configuration)
     {
         _repository = repository;
         _context = context;
+        _httpClientFactory = httpClientFactory;
+        _httpContextAccessor = httpContextAccessor;
+        _configuration = configuration;
+    }
+
+    private async Task TryCreateMovementAsync(CreateMovementDto dto)
+    {
+        try
+        {
+            var movementServiceUrl = _configuration["Services:MovementService"];
+            if (string.IsNullOrWhiteSpace(movementServiceUrl))
+            {
+                Console.WriteLine("Movement service URL is not configured.");
+                return;
+            }
+
+            var token = _httpContextAccessor.HttpContext?.Request.Headers.Authorization.ToString();
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                Console.WriteLine("Skipping automatic movement creation because no bearer token was found.");
+                return;
+            }
+
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = AuthenticationHeaderValue.Parse(token);
+
+            var response = await client.PostAsJsonAsync($"{movementServiceUrl}/api/movements", dto);
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Automatic movement creation failed: {response.StatusCode} {body}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Automatic movement creation error: {ex.Message}");
+        }
     }
 
     public async Task<Warehouse> CreateWarehouseAsync(Warehouse warehouse)
@@ -64,9 +112,9 @@ public class WarehouseServiceImpl : IWarehouseService
         return stock;
     }
 
-    public async Task UpdateStockAsync(int warehouseId, Guid productId, int qty)
+    public async Task UpdateStockAsync(StockRequestDto dto)
     {
-        var warehouse = await _repository.FindByWarehouseIdAsync(warehouseId);
+        var warehouse = await _repository.FindByWarehouseIdAsync(dto.WarehouseId);
 
         if (warehouse == null)
             throw new KeyNotFoundException("Warehouse not found");
@@ -74,15 +122,15 @@ public class WarehouseServiceImpl : IWarehouseService
         if (!warehouse.IsActive)
             throw new InvalidOperationException("Warehouse is inactive");
 
-        var stock = await _repository.FindStockByWarehouseAndProductAsync(warehouseId, productId);
+        var stock = await _repository.FindStockByWarehouseAndProductAsync(dto.WarehouseId, dto.ProductId);
 
         if (stock == null)
         {
             stock = new StockLevel
             {
-                WarehouseId = warehouseId,
-                ProductId = productId,
-                Quantity = qty,
+                WarehouseId = dto.WarehouseId,
+                ProductId = dto.ProductId,
+                Quantity = dto.Quantity,
                 ReservedQuantity = 0,
                 Location = warehouse.Location
             };
@@ -91,13 +139,26 @@ public class WarehouseServiceImpl : IWarehouseService
         }
         else
         {
-            stock.Quantity += qty;
+            stock.Quantity += dto.Quantity;
 
             if (stock.Quantity < 0)
                 throw new ArgumentException("Stock cannot be negative");
 
             await _repository.UpdateStockAsync(stock);
         }
+
+        await TryCreateMovementAsync(new CreateMovementDto
+        {
+            ProductId = dto.ProductId,
+            WarehouseId = dto.WarehouseId,
+            MovementType = dto.Quantity >= 0 ? "STOCK_IN" : "STOCK_OUT",
+            Quantity = Math.Abs(dto.Quantity),
+            BalanceAfter = stock.Quantity,
+            ReferenceType = string.IsNullOrWhiteSpace(dto.ReferenceType) ? "WAREHOUSE" : dto.ReferenceType,
+            ReferenceId = dto.ReferenceId,
+            UnitCost = dto.UnitCost,
+            Notes = string.IsNullOrWhiteSpace(dto.Notes) ? (dto.Quantity >= 0 ? "Auto-created from warehouse stock update." : "Auto-created from warehouse stock deduction.") : dto.Notes
+        });
     }
 
     public async Task ReserveStockAsync(int warehouseId, Guid productId, int qty)
@@ -189,6 +250,30 @@ public class WarehouseServiceImpl : IWarehouseService
             }
 
             await tx.CommitAsync();
+
+            await TryCreateMovementAsync(new CreateMovementDto
+            {
+                ProductId = productId,
+                WarehouseId = fromWarehouse,
+                MovementType = "TRANSFER_OUT",
+                Quantity = qty,
+                BalanceAfter = source.Quantity,
+                ReferenceType = "TRANSFER",
+                ReferenceId = toWarehouse,
+                Notes = $"Auto-created from transfer to warehouse {toWarehouse}."
+            });
+
+            await TryCreateMovementAsync(new CreateMovementDto
+            {
+                ProductId = productId,
+                WarehouseId = toWarehouse,
+                MovementType = "TRANSFER_IN",
+                Quantity = qty,
+                BalanceAfter = target.Quantity,
+                ReferenceType = "TRANSFER",
+                ReferenceId = fromWarehouse,
+                Notes = $"Auto-created from transfer from warehouse {fromWarehouse}."
+            });
         }
         catch
         {
@@ -199,5 +284,10 @@ public class WarehouseServiceImpl : IWarehouseService
     public async Task<List<StockLevel>> GetLowStockItemsAsync()
     {
         return await _repository.FindLowStockItemsAsync();
+    }
+
+    public async Task<List<StockLevel>> GetAllStockAsync()
+    {
+        return await _repository.GetAllStockAsync();
     }
 }

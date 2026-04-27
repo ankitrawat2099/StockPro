@@ -21,5 +21,5 @@ public class InventorySnapshot
     [Required]
     public DateOnly SnapshotDate { get; set; }
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 }

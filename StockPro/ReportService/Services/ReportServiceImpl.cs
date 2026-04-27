@@ -12,114 +12,109 @@ public class ReportServiceImpl : IReportService
         _httpClientFactory = httpClientFactory;
         _config = config;
     }
+
+    private static async Task<T> SafeAsync<T>(Func<Task<T>> factory, T fallback)
+    {
+        try
+        {
+            return await factory();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Report query fallback: {ex.Message}");
+            return fallback;
+        }
+    }
 //take snapshot
     public async Task TakeSnapshot()
-{
-    Console.WriteLine("START SNAPSHOT");
-
-    var today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-    var existing = await _repository.FindBySnapshotDate(today);
-    if (existing.Any())
     {
-        Console.WriteLine("Snapshot already exists for today");
-        return;
-    }
+        Console.WriteLine("START SNAPSHOT");
 
-    var client = _httpClientFactory.CreateClient();
+        var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+        var today = DateOnly.FromDateTime(istNow);
 
-    var warehouseUrl = _config["WarehouseService:BaseUrl"];
-    var productUrl = _config["ProductService:BaseUrl"];
-
-    Console.WriteLine($"Warehouse URL: {warehouseUrl}");
-    Console.WriteLine($"Product URL: {productUrl}");
-
-    //call warehouse
-    var stocks = await client.GetFromJsonAsync<List<StockLevelDto>>(
-        $"{warehouseUrl}/api/stock/low"
-    );
-
-    Console.WriteLine($"Stocks fetched: {stocks?.Count ?? 0}");
-
-    if (stocks == null || !stocks.Any())
-    {
-        Console.WriteLine("No stock data found");
-        return;
-    }
-
-    foreach (var stock in stocks)
-    {
-        Console.WriteLine($"rocessing ProductId: {stock.ProductId}, Qty: {stock.Quantity}");
-
-        //call product
-        var product = await client.GetFromJsonAsync<ProductDto>(
-            $"{productUrl}/api/products/{stock.ProductId}"
-        );
-
-        if (product == null)
+        var existing = await _repository.FindBySnapshotDate(today);
+        if (existing.Any())
         {
-            Console.WriteLine($"Product NOT FOUND: {stock.ProductId}");
-            continue;
+            Console.WriteLine("Snapshot already exists for today");
+            return;
         }
 
-        Console.WriteLine($"Product found: {product.ProductId}, Cost: {product.CostPrice}");
+        var client = _httpClientFactory.CreateClient();
+        var warehouseUrl = _config["WarehouseService:BaseUrl"];
+        var productUrl = _config["ProductService:BaseUrl"];
 
-        var value = stock.Quantity * product.CostPrice;
+        // Call warehouse to get ALL stock
+        var stocks = await client.GetFromJsonAsync<List<StockLevelDto>>($"{warehouseUrl}/api/stock/all");
 
-        Console.WriteLine($"Calculated Value: {value}");
-
-        var snapshot = new InventorySnapshot
+        if (stocks == null || !stocks.Any())
         {
-            WarehouseId = stock.WarehouseId,
-            ProductId = stock.ProductId,
-            Quantity = stock.Quantity,
-            StockValue = value,
-            SnapshotDate = today
-        };
+            Console.WriteLine("No stock data found");
+            return;
+        }
 
-        Console.WriteLine("Saving snapshot...");
+        foreach (var stock in stocks)
+        {
+            // Call product to get cost
+            var product = await client.GetFromJsonAsync<ProductDto>($"{productUrl}/api/products/{stock.ProductId}");
+            if (product == null) continue;
 
-        await _repository.AddAsync(snapshot);
+            var snapshot = new InventorySnapshot
+            {
+                WarehouseId = stock.WarehouseId,
+                ProductId = stock.ProductId,
+                Quantity = stock.Quantity,
+                StockValue = stock.Quantity * product.CostPrice,
+                SnapshotDate = today
+            };
 
-        Console.WriteLine("Snapshot saved");
+            await _repository.AddAsync(snapshot);
+        }
+
+        Console.WriteLine("SNAPSHOT COMPLETE");
     }
-
-    Console.WriteLine("SNAPSHOT COMPLETE");
-}
 
     //total stock value
     public async Task<double> GetTotalStockValue()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var data = await _repository.FindBySnapshotDate(today);
+        return await SafeAsync(async () =>
+        {
+            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var today = DateOnly.FromDateTime(istNow);
+            var data = await _repository.FindBySnapshotDate(today);
 
-        return data.Sum(x => x.StockValue);
+            return data.Sum(x => x.StockValue);
+        }, 0);
     }
 
     public async Task<double> GetStockValueByWarehouse(int warehouseId)
     {
-        return await _repository.SumStockValueByWarehouse(warehouseId);
+        return await SafeAsync(() => _repository.SumStockValueByWarehouse(warehouseId), 0d);
     }
 
     public async Task<double> GetInventoryTurnover(DateOnly start, DateOnly end)
     {
-        var data = await _repository.FindByDateBetween(start, end);
+        return await SafeAsync(async () =>
+        {
+            var data = await _repository.FindByDateBetween(start, end);
 
-        if (!data.Any()) return 0;
+            if (!data.Any()) return 0;
 
-        var avg = data.Average(x => x.StockValue);
+            var avg = data.Average(x => x.StockValue);
 
-        return avg == 0 ? 0 : (double)(data.Sum(x => x.StockValue) / avg);
+            return avg == 0 ? 0 : (double)(data.Sum(x => x.StockValue) / avg);
+        }, 0d);
     }
 
     public async Task<List<InventorySnapshot>> GetLowStockReport()
     {
-        return await _repository.FindLowStockSnapshot();
+        return await SafeAsync(() => _repository.FindLowStockSnapshot(), new List<InventorySnapshot>());
     }
 
     public async Task<Dictionary<string, int>> GetStockMovementSummary()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+        var today = DateOnly.FromDateTime(istNow);
         var yesterday = today.AddDays(-1);
 
         var todayData = await _repository.FindBySnapshotDate(today);
@@ -151,60 +146,80 @@ public class ReportServiceImpl : IReportService
 
     public async Task<List<Guid>> GetTopMovingProducts()
     {
-        var data = await _repository.FindByDateBetween(
-            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)),
-            DateOnly.FromDateTime(DateTime.UtcNow)
-        );
+        return await SafeAsync(async () =>
+        {
+            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var data = await _repository.FindByDateBetween(
+                DateOnly.FromDateTime(istNow.AddDays(-7)),
+                DateOnly.FromDateTime(istNow)
+            );
 
-        return data.GroupBy(x => x.ProductId).OrderByDescending(g => g.Sum(x => x.Quantity))
-            .Take(5).Select(g => g.Key).ToList();
+            return data.GroupBy(x => x.ProductId).OrderByDescending(g => g.Sum(x => x.Quantity))
+                .Take(5).Select(g => g.Key).ToList();
+        }, new List<Guid>());
     }
 
     public async Task<List<Guid>> GetSlowMovingProducts()
     {
-        var data = await _repository.FindByDateBetween(
-            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-7)),
-            DateOnly.FromDateTime(DateTime.UtcNow)
-        );
+        return await SafeAsync(async () =>
+        {
+            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var data = await _repository.FindByDateBetween(
+                DateOnly.FromDateTime(istNow.AddDays(-7)),
+                DateOnly.FromDateTime(istNow)
+            );
 
-        return data
-            .GroupBy(x => x.ProductId).OrderBy(g => g.Sum(x => x.Quantity)).Take(5).Select(g => g.Key).ToList();
+            return data
+                .GroupBy(x => x.ProductId).OrderBy(g => g.Sum(x => x.Quantity)).Take(5).Select(g => g.Key).ToList();
+        }, new List<Guid>());
     }
 
     public async Task<Dictionary<int, double>> GetPOSummary()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        return await SafeAsync(async () =>
+        {
+            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var today = DateOnly.FromDateTime(istNow);
 
-        var data = await _repository.FindBySnapshotDate(today);
+            var data = await _repository.FindBySnapshotDate(today);
 
-        return data
-            .GroupBy(x => x.WarehouseId)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Sum(x => x.StockValue)
-            );
+            return data
+                .GroupBy(x => x.WarehouseId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Sum(x => x.StockValue)
+                );
+        }, new Dictionary<int, double>());
     }
 
     public async Task<byte[]> GenerateInventoryReport()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-        var data = await _repository.FindBySnapshotDate(today);
+        return await SafeAsync(async () =>
+        {
+            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var today = DateOnly.FromDateTime(istNow);
+            var data = await _repository.FindBySnapshotDate(today);
 
-        var text = string.Join("\n", data.Select(x =>
-            $"Product:{x.ProductId} Qty:{x.Quantity} Value:{x.StockValue}"
-        ));
+            var text = string.Join("\n", data.Select(x =>
+                $"Product:{x.ProductId} Qty:{x.Quantity} Value:{x.StockValue}"
+            ));
 
-        return System.Text.Encoding.UTF8.GetBytes(text);
+            return System.Text.Encoding.UTF8.GetBytes(text);
+        }, System.Text.Encoding.UTF8.GetBytes("No report data available."));
     }
 
     public async Task<List<Guid>> GetDeadStock()
     {
-        var data = await _repository.FindByDateBetween(
-            DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-30)),
-            DateOnly.FromDateTime(DateTime.UtcNow)
-        );
+        return await SafeAsync(async () =>
+        {
+            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var data = await _repository.FindByDateBetween(
+                DateOnly.FromDateTime(istNow.AddDays(-30)),
+                DateOnly.FromDateTime(istNow)
+            );
 
-        return data
-            .GroupBy(x => x.ProductId).Where(g => g.All(x => x.Quantity == 0)).Select(g => g.Key).ToList();
+            return data
+                .GroupBy(x => x.ProductId).Where(g => g.All(x => x.Quantity == 0)).Select(g => g.Key).ToList();
+        }, new List<Guid>());
     }
 }

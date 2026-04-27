@@ -20,7 +20,7 @@ public class PurchaseOrder
 
     public double TotalAmount { get; set; }
 
-    public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+    public DateTime OrderDate { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
     public DateTime? ExpectedDate { get; set; }
 
@@ -29,4 +29,5 @@ public class PurchaseOrder
     public string? Notes { get; set; }
 
     public string? ReferenceNumber { get; set; }
+    public List<POLineItem> Items { get; set; } = new();
 }

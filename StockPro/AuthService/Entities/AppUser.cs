@@ -1,11 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace AuthService.Entities;
 
 public class AppUser
 {
-    
     [Key]
     public Guid UserId { get; set; }
 
@@ -31,7 +28,7 @@ public class AppUser
 
     public bool IsActive { get; set; } = true;
 
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
     public DateTime? LastLoginAt { get; set; }
 }

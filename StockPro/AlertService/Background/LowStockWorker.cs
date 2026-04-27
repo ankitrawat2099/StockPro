@@ -34,13 +34,13 @@ public class LowStockWorker : BackgroundService
 
             try
             {
-                //call low stock api
-                var response = await client.GetAsync($"{warehouseBaseUrl}/api/stock/low");
-                Console.WriteLine($" Warehouse LowStock API: {response.StatusCode}");
+                //call all stock api
+                var response = await client.GetAsync($"{warehouseBaseUrl}/api/stock/all");
+                Console.WriteLine($" Warehouse AllStock API: {response.StatusCode}");
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    Console.WriteLine("Failed to fetch low stock");
+                    Console.WriteLine("Failed to fetch all stock");
                     continue;
                 }
 
@@ -49,7 +49,7 @@ public class LowStockWorker : BackgroundService
 
                 if (stockList == null || !stockList.Any())
                 {
-                    Console.WriteLine("No low stock items");
+                    Console.WriteLine("No stock items found");
                     continue;
                 }
 

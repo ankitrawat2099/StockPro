@@ -79,9 +79,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",policy=>policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseCors("AllowReact");
 
 app.UseSwagger();
 app.UseSwaggerUI();

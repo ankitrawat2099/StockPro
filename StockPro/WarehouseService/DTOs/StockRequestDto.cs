@@ -7,4 +7,9 @@ public class StockRequestDto
 
     [Range(1, int.MaxValue)]
     public int Quantity { get; set; }
+
+    public string ReferenceType { get; set; } = "";
+    public int ReferenceId { get; set; }
+    public string Notes { get; set; } = "";
+    public double UnitCost { get; set; }
 }

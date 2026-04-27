@@ -55,16 +55,42 @@ public class AuthServiceImpl : IAuthService
             Email = request.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             Phone = request.Phone,
-            Role = request.Role,
+            Role = request.Role?.ToUpper() ?? "STAFF",
             Department = request.Department,
             IsActive = true,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"))
         };
 
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
 
         return "User registered successfully";
+    }
+
+    private static Claim[] BuildTokenClaims(AppUser user)
+    {
+        return
+        [
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            // Include both claim styles so every downstream service can authorize consistently.
+            new Claim(ClaimTypes.Role, user.Role),
+            new Claim("role", user.Role)
+        ];
+    }
+
+    private static string GetClaimValue(JwtSecurityToken token, params string[] types)
+    {
+        foreach (var type in types)
+        {
+            var value = token.Claims.FirstOrDefault(claim => claim.Type == type)?.Value;
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        throw new UnauthorizedAccessException("Required token claim is missing");
     }
 
     //Login
@@ -83,16 +109,11 @@ public class AuthServiceImpl : IAuthService
         if (!isValid)
             throw new Exception("Invalid email or password");
 
-        user.LastLoginAt = DateTime.UtcNow;
+        user.LastLoginAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.Role)
-        };
+        var claims = BuildTokenClaims(user);
 
         var keyString = _config["Jwt:Key"] ?? throw new Exception("JWT Key missing");
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(keyString));
@@ -151,15 +172,16 @@ public class AuthServiceImpl : IAuthService
 
         var jwtToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
-        var userId = jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        var email = jwtToken.Claims.First(x => x.Type == ClaimTypes.Email).Value;
-        var role = jwtToken.Claims.First(x => x.Type == ClaimTypes.Role).Value;
+        var userId = GetClaimValue(jwtToken, ClaimTypes.NameIdentifier);
+        var email = GetClaimValue(jwtToken, ClaimTypes.Email);
+        var role = GetClaimValue(jwtToken, ClaimTypes.Role, "role");
 
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, userId),
             new Claim(ClaimTypes.Email, email),
-            new Claim(ClaimTypes.Role, role)
+            new Claim(ClaimTypes.Role, role),
+            new Claim("role", role)
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));

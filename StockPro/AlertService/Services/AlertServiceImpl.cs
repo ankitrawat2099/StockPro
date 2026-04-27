@@ -15,7 +15,7 @@ public class AlertServiceImpl : IAlertService
         if (alert == null)
             throw new ArgumentException("Invalid alert");
 
-        alert.CreatedAt = DateTime.UtcNow;
+        alert.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
         alert.IsRead = false;
         alert.IsAcknowledged = false;
 

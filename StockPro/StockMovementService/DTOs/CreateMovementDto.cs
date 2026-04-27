@@ -21,5 +21,7 @@ public class CreateMovementDto
 
     public double UnitCost { get; set; }
 
-    public string Notes { get; set; }
+    public string Notes { get; set; } = "";
+
+    public int BalanceAfter { get; set; }
 }

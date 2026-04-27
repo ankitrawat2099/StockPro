@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +61,7 @@ builder.Services.AddDbContext<ProductDbContext>(options =>
 //DI
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductServiceImpl>();
+builder.Services.AddHttpClient();
 
 
 // JWT Authentication
@@ -74,6 +76,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            RoleClaimType = ClaimTypes.Role,
+            NameClaimType = ClaimTypes.NameIdentifier,
 
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
@@ -81,9 +85,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(key!))
         };
     });
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",policy=>policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
 var app = builder.Build();
+app.UseCors("AllowReact");
 
 if (app.Environment.IsDevelopment())
 {

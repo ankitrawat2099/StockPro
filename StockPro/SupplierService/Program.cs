@@ -71,10 +71,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(key!))
         };
     });
+    builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",policy=>policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
 
 var app = builder.Build();
-
+app.UseCors("AllowReact");
 // Swagger
 if (app.Environment.IsDevelopment())
 {

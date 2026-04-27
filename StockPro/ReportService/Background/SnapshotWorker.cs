@@ -14,12 +14,19 @@ public class SnapshotWorker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            Console.WriteLine("Taking daily snapshot...");
+            try
+            {
+                Console.WriteLine("Taking daily snapshot...");
 
-            using var scope = _serviceProvider.CreateScope();
-            var service = scope.ServiceProvider.GetRequiredService<IReportService>();
+                using var scope = _serviceProvider.CreateScope();
+                var service = scope.ServiceProvider.GetRequiredService<IReportService>();
 
-            await service.TakeSnapshot();
+                await service.TakeSnapshot();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Snapshot worker skipped due to error: {ex.Message}");
+            }
 
             //run once every 24 hours
             await Task.Delay(TimeSpan.FromHours(24), stoppingToken);

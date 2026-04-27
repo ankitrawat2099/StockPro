@@ -4,6 +4,7 @@ public interface IPurchaseService
     Task<PurchaseOrder> GetPOById(int id);
     Task<List<PurchaseOrder>> GetPOsBySupplier(int supplierId);
     Task<List<PurchaseOrder>> GetPOsByStatus(string status);
+    Task SubmitForApproval(int id);
     Task ApprovePO(int id);
     Task ReceiveGoods(int id, ReceiveGoodsDto dto);
     Task CancelPO(int id);

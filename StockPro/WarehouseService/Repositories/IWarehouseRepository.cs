@@ -12,6 +12,8 @@ public interface IWarehouseRepository
 
     Task<List<StockLevel>> FindLowStockItemsAsync();
 
+    Task<List<StockLevel>> GetAllStockAsync();
+
     Task<int> CountByIsActiveAsync(bool isActive);
 
     Task<Warehouse> SaveWarehouseAsync(Warehouse warehouse);

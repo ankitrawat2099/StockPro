@@ -12,7 +12,7 @@ public interface IWarehouseService
 
     Task<StockLevel> GetStockLevelAsync(int warehouseId, Guid productId);
 
-    Task UpdateStockAsync(int warehouseId, Guid productId, int qty);
+    Task UpdateStockAsync(StockRequestDto dto);
 
     Task ReserveStockAsync(int warehouseId, Guid productId, int qty);
 
@@ -21,4 +21,6 @@ public interface IWarehouseService
     Task TransferStockAsync(int fromWarehouse, int toWarehouse, Guid productId, int qty);
 
     Task<List<StockLevel>> GetLowStockItemsAsync();
+
+    Task<List<StockLevel>> GetAllStockAsync();
 }

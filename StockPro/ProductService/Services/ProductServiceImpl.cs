@@ -3,6 +3,9 @@ using ProductService.Entities;
 using ProductService.Repositories;
 using ProductService.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Net.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace ProductService.Services;
 
@@ -10,11 +13,15 @@ public class ProductServiceImpl : IProductService
 {
     private readonly IProductRepository _repository;
     private readonly ProductDbContext _context;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IConfiguration _configuration;
 
-    public ProductServiceImpl(IProductRepository repository, ProductDbContext context)
+    public ProductServiceImpl(IProductRepository repository, ProductDbContext context, IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _repository = repository;
         _context = context;
+        _httpClientFactory = httpClientFactory;
+        _configuration = configuration;
     }
 
     //mapping dto
@@ -157,11 +164,43 @@ public class ProductServiceImpl : IProductService
 
     //low stock
    public async Task<List<ProductResponseDto>> GetLowStockProductsAsync()
-{
-    var products = await _repository.FindByIsActiveAsync(true);
+    {
+        var products = await _repository.FindByIsActiveAsync(true);
+        var warehouseUrl = _configuration["Services:WarehouseService"];
+        
+        if (string.IsNullOrEmpty(warehouseUrl)) 
+        {
+            // Fallback if WarehouseService is not configured
+            return new List<ProductResponseDto>();
+        }
 
-    var lowStock = products.Where(p => p.MaxStockLevel <= p.ReorderLevel).ToList();
+        var client = _httpClientFactory.CreateClient();
+        var response = await client.GetAsync($"{warehouseUrl}/api/stock/all");
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            return new List<ProductResponseDto>();
+        }
 
-    return lowStock.Select(Map).ToList();
+        var stockDataString = await response.Content.ReadAsStringAsync();
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var allStocks = JsonSerializer.Deserialize<List<StockLevelDto>>(stockDataString, options) ?? new List<StockLevelDto>();
+
+        // Group total physical quantity by ProductId
+        var stockPerProduct = allStocks
+            .GroupBy(s => s.ProductId)
+            .ToDictionary(g => g.Key, g => g.Sum(s => s.Quantity));
+
+        var lowStock = products.Where(p => 
+        {
+            // If product has no stock at all, it's 0
+            int currentStock = stockPerProduct.ContainsKey(p.ProductId) ? stockPerProduct[p.ProductId] : 0;
+            return currentStock < p.ReorderLevel;
+        }).ToList();
+
+        return lowStock.Select(Map).ToList();
+    }
 }
-}
+
+// Minimal DTO for deserializing warehouse stock response
+public record StockLevelDto(Guid ProductId, int Quantity);

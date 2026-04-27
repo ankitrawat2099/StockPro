@@ -39,6 +39,11 @@ public class WarehouseRepository : IWarehouseRepository
         return await _context.StockLevels.Where(x => (x.Quantity - x.ReservedQuantity) < 10).ToListAsync();
     }
 
+    public async Task<List<StockLevel>> GetAllStockAsync()
+    {
+        return await _context.StockLevels.ToListAsync();
+    }
+
     public async Task<int> CountByIsActiveAsync(bool isActive)
     {
         return await _context.Warehouses.CountAsync(x => x.IsActive == isActive);

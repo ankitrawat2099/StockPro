@@ -22,7 +22,7 @@ public class PurchaseServiceImpl : IPurchaseService
         try
         {
             po.Status = "DRAFT";
-            po.OrderDate = DateTime.UtcNow;
+            po.OrderDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
             await _context.PurchaseOrders.AddAsync(po);
             await _context.SaveChangesAsync();
@@ -57,28 +57,53 @@ public class PurchaseServiceImpl : IPurchaseService
     //get by id
     public async Task<PurchaseOrder> GetPOById(int id)
     {
-        return await _context.PurchaseOrders.FirstOrDefaultAsync(x => x.PoId == id);
+        return await _context.PurchaseOrders
+            .Include(x => x.Items)
+            .FirstOrDefaultAsync(x => x.PoId == id);
     }
 
     public async Task<List<PurchaseOrder>> GetPOsBySupplier(int supplierId)
     {
-        return await _context.PurchaseOrders.Where(x => x.SupplierId == supplierId).ToListAsync();
+        return await _context.PurchaseOrders
+            .Include(x => x.Items)
+            .Where(x => x.SupplierId == supplierId).ToListAsync();
     }
 
     public async Task<List<PurchaseOrder>> GetPOsByStatus(string status)
     {
-        return await _context.PurchaseOrders.Where(x => x.Status == status).ToListAsync();
+        return await _context.PurchaseOrders
+            .Include(x => x.Items)
+            .Where(x => x.Status == status).ToListAsync();
     }
 
     public async Task<List<PurchaseOrder>> GetPOsByWarehouse(int warehouseId)
     {
-        return await _context.PurchaseOrders.Where(x => x.WarehouseId == warehouseId).ToListAsync();
+        return await _context.PurchaseOrders
+            .Include(x => x.Items)
+            .Where(x => x.WarehouseId == warehouseId).ToListAsync();
     }
 
     public async Task<List<PurchaseOrder>> GetPOsByDateRange(DateTime start, DateTime end)
     {
-        return await _context.PurchaseOrders.Where(x => x.OrderDate >= start && x.OrderDate <= end).ToListAsync();
+        return await _context.PurchaseOrders
+            .Include(x => x.Items)
+            .Where(x => x.OrderDate >= start && x.OrderDate <= end).ToListAsync();
     }
+    public async Task SubmitForApproval(int id)
+    {
+        var po = await _context.PurchaseOrders.FindAsync(id);
+
+        if (po == null)
+            throw new Exception("PO not found");
+
+        if (po.Status != "DRAFT")
+            throw new Exception("PO must be in DRAFT state to be submitted");
+
+        po.Status = "PENDING";
+
+        await _context.SaveChangesAsync();
+    }
+
     public async Task ApprovePO(int id)
     {
         var po = await _context.PurchaseOrders.FindAsync(id);
@@ -87,7 +112,7 @@ public class PurchaseServiceImpl : IPurchaseService
             throw new Exception("PO not found");
 
         if (po.Status != "PENDING")
-            throw new Exception("PO must be in PENDING state");
+            throw new Exception("PO must be in PENDING state to be approved");
 
         po.Status = "APPROVED";
 
@@ -138,7 +163,8 @@ public class PurchaseServiceImpl : IPurchaseService
                     productId = lineItem.ProductId,
                     quantity = itemDto.ReceivedQty,
                     referenceType = "PURCHASE",
-                    referenceId = po.PoId.ToString(),
+                    referenceId = po.PoId,
+                    unitCost = lineItem.UnitCost,
                     notes = "Goods received from PO"
                 });
 
@@ -153,7 +179,7 @@ public class PurchaseServiceImpl : IPurchaseService
             if (isFull)
             {
                 po.Status = "RECEIVED";
-                po.ReceivedDate = DateTime.UtcNow;
+                po.ReceivedDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
             }
             else
             {

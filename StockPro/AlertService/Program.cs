@@ -87,8 +87,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",policy=>policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
 var app = builder.Build();
+app.UseCors("AllowReact");
 
 if (app.Environment.IsDevelopment())
 {

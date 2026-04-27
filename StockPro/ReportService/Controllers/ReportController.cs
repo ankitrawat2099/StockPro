@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/reports")]
@@ -12,6 +13,7 @@ public class ReportController : ControllerBase
     }
 
     // TOTAL VALUE
+    [Authorize(Roles ="MANAGER,ADMIN")]
     [HttpGet("totalValue")]
     public async Task<IActionResult> GetTotalValue()
     {
@@ -19,6 +21,7 @@ public class ReportController : ControllerBase
     }
 
     // BY WAREHOUSE
+    [Authorize(Roles ="MANAGER,ADMIN")]
     [HttpGet("byWarehouse")]
     public async Task<IActionResult> GetByWarehouse(int warehouseId)
     {
@@ -26,6 +29,7 @@ public class ReportController : ControllerBase
     }
 
     //TURNOVER
+    [Authorize(Roles ="MANAGER,ADMIN")]
     [HttpGet("turnover")]
     public async Task<IActionResult> GetTurnover(DateOnly start, DateOnly end)
     {
@@ -33,6 +37,7 @@ public class ReportController : ControllerBase
     }
 
     //LOW STOCK
+    [Authorize(Roles ="MANAGER")]
     [HttpGet("lowStock")]
     public async Task<IActionResult> GetLowStock()
     {
@@ -40,6 +45,7 @@ public class ReportController : ControllerBase
     }
 
     //TOP MOVING
+    [Authorize(Roles ="MANAGER,ADMIN")]
     [HttpGet("topMoving")]
     public async Task<IActionResult> GetTopMoving()
     {
@@ -47,6 +53,7 @@ public class ReportController : ControllerBase
     }
 
     //SLOW MOVING
+    [Authorize(Roles ="MANAGER")]
     [HttpGet("slowMoving")]
     public async Task<IActionResult> GetSlowMoving()
     {
@@ -54,6 +61,7 @@ public class ReportController : ControllerBase
     }
 
     //DEAD STOCK
+    [Authorize(Roles ="MANAGER,ADMIN")]
     [HttpGet("deadStock")]
     public async Task<IActionResult> GetDeadStock()
     {
@@ -61,17 +69,19 @@ public class ReportController : ControllerBase
     }
 
     //PO SUMMARY
+    [Authorize(Roles ="MANAGER,ADMIN")]
     [HttpGet("poSummary")]
     public async Task<IActionResult> GetPOSummary()
     {
         return Ok(await _service.GetPOSummary());
     }
 
-    //GENERATE REPORT
+    [Authorize(Roles ="MANAGER,ADMIN")]
     [HttpGet("generateReport")]
     public async Task<IActionResult> GenerateReport()
     {
         var file = await _service.GenerateInventoryReport();
         return File(file, "application/octet-stream", "report.txt");
     }
+
 }

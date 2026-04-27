@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -53,6 +54,7 @@ builder.Services.AddDbContext<WarehouseDbContext>(options =>
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IWarehouseService, WarehouseServiceImpl>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
 
 
 //jwt
@@ -67,6 +69,8 @@ builder.Services.AddAuthentication("Bearer")
                 ValidateIssuer = true,
                 ValidateAudience = true,
                 ValidateIssuerSigningKey = true,
+                RoleClaimType = ClaimTypes.Role,
+                NameClaimType = ClaimTypes.NameIdentifier,
                 ValidIssuer = builder.Configuration["Jwt:Issuer"],
                 ValidAudience = builder.Configuration["Jwt:Audience"],
                 IssuerSigningKey =
@@ -74,8 +78,13 @@ builder.Services.AddAuthentication("Bearer")
                         System.Text.Encoding.UTF8.GetBytes(key))
             };
     });
+    builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",policy=>policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
 
 var app = builder.Build();
+app.UseCors("AllowReact");
 
 app.UseSwagger();
 app.UseSwaggerUI();

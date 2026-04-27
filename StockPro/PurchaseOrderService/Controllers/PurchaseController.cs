@@ -13,6 +13,7 @@ public class PurchaseController : ControllerBase
     {
         _service = service;
     }
+    [Authorize(Roles ="OFFICER")]
     [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreatePurchaseOrderDto dto)
     {
@@ -27,13 +28,14 @@ public class PurchaseController : ControllerBase
             Notes = dto.Notes,
             ReferenceNumber = dto.ReferenceNumber,
             Status = "DRAFT",
-            OrderDate = DateTime.UtcNow,
+            OrderDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")),
             TotalAmount = dto.Items.Sum(x => x.Quantity * x.UnitCost)
         };
 
         return Ok(await _service.CreatePO(po, dto.Items));
     }
 
+[Authorize(Roles ="MANAGER,ADMIN,OFFICER,STAFF")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -41,31 +43,42 @@ public class PurchaseController : ControllerBase
         if (po == null) return NotFound();
         return Ok(po);
     }
-
+[Authorize(Roles ="MANAGER,ADMIN,OFFICER,STAFF")]
     [HttpGet("supplier/{supplierId}")]
     public async Task<IActionResult> GetBySupplier(int supplierId)
     {
         return Ok(await _service.GetPOsBySupplier(supplierId));
     }
 
+    [Authorize(Roles ="MANAGER,ADMIN,OFFICER,STAFF")]
+
     [HttpGet("status/{status}")]
     public async Task<IActionResult> GetByStatus(string status)
     {
         return Ok(await _service.GetPOsByStatus(status));
     }
-
+[Authorize(Roles ="MANAGER,ADMIN,OFFICER,STAFF")]
     [HttpGet("warehouse/{warehouseId}")]
     public async Task<IActionResult> GetByWarehouse(int warehouseId)
     {
         return Ok(await _service.GetPOsByWarehouse(warehouseId));
     }
-
+[Authorize(Roles ="MANAGER,ADMIN,OFFICER,STAFF")]
     [HttpGet("dateRange")]
     public async Task<IActionResult> GetByDateRange(DateTime start, DateTime end)
     {
         return Ok(await _service.GetPOsByDateRange(start, end));
     }
 
+[Authorize(Roles ="OFFICER")]
+    [HttpPut("{id}/submit")]
+    public async Task<IActionResult> Submit(int id)
+    {
+        await _service.SubmitForApproval(id);
+        return Ok("Submitted");
+    }
+
+[Authorize(Roles ="OFFICER,MANAGER")]
     [HttpPut("{id}/approve")]
     public async Task<IActionResult> Approve(int id)
     {
@@ -73,13 +86,14 @@ public class PurchaseController : ControllerBase
         return Ok("Approved");
     }
 
+[Authorize(Roles ="STAFF")]
     [HttpPost("{id}/receive")]
     public async Task<IActionResult> Receive(int id, [FromBody] ReceiveGoodsDto dto)
     {
         await _service.ReceiveGoods(id, dto);
         return Ok("Goods Received");
     }
-
+[Authorize(Roles ="OFFICER")]
     [HttpPut("{id}/cancel")]
     public async Task<IActionResult> Cancel(int id)
     {
@@ -87,6 +101,7 @@ public class PurchaseController : ControllerBase
         return Ok("Cancelled");
     }
 
+[Authorize(Roles ="OFFICER")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdatePurchaseOrderDto dto)
     {

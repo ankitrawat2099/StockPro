@@ -17,7 +17,7 @@ public class ProductController : ControllerBase
     }
 
     //CREATE
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "MANAGER")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ProductRequest request)
     {
@@ -38,7 +38,7 @@ public class ProductController : ControllerBase
     }
 
     //get by sku
-    [Authorize]
+     [Authorize(Roles ="ADMIN,MANAGER,STAFF,OFFICER")]
     [HttpGet("sku/{sku}")]
     public async Task<IActionResult> GetBySku(string sku)
     {
@@ -47,7 +47,7 @@ public class ProductController : ControllerBase
     }
 
     //get by catergory
-    [Authorize]
+     [Authorize(Roles ="ADMIN,MANAGER,STAFF,OFFICER")]
     [HttpGet("category/{category}")]
     public async Task<IActionResult> GetByCategory(string category)
     {
@@ -56,7 +56,7 @@ public class ProductController : ControllerBase
     }
 
     //get by brand
-    [Authorize]
+     [Authorize(Roles ="ADMIN,MANAGER,STAFF,OFFICER")]
     [HttpGet("brand/{brand}")]
     public async Task<IActionResult> GetByBrand(string brand)
     {
@@ -65,7 +65,7 @@ public class ProductController : ControllerBase
     }
 
     //get by barcode
-    [Authorize]
+     [Authorize(Roles ="ADMIN,MANAGER,STAFF,OFFICER")]
     [HttpGet("barcode/{barcode}")]
     public async Task<IActionResult> GetByBarcode(string barcode)
     {
@@ -74,7 +74,7 @@ public class ProductController : ControllerBase
     }
 
     //search
-    [Authorize]
+     [Authorize(Roles ="ADMIN,MANAGER,STAFF,OFFICER")]
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string name)
     {
@@ -83,7 +83,7 @@ public class ProductController : ControllerBase
     }
 
     //get all
-    [Authorize]
+     [Authorize(Roles ="ADMIN,MANAGER,STAFF,OFFICER")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -92,7 +92,7 @@ public class ProductController : ControllerBase
     }
 
     //low stock
-    [Authorize]
+    [Authorize(Roles ="ADMIN,MANAGER,STAFF,OFFICER")]
     [HttpGet("lowStock")]
     public async Task<IActionResult> GetLowStock()
     {
@@ -101,7 +101,7 @@ public class ProductController : ControllerBase
     }
 
     //ypdate
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "MANAGER")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, [FromBody] ProductRequest request)
     {
@@ -110,7 +110,7 @@ public class ProductController : ControllerBase
     }
 
     //deactivate
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "MANAGER")]
     [HttpPut("{id}/deactivate")]
     public async Task<IActionResult> Deactivate(Guid id)
     {
@@ -119,7 +119,7 @@ public class ProductController : ControllerBase
     }
 
     //delete
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "MANAGER")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
