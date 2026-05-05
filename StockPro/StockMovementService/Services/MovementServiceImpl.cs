@@ -46,7 +46,7 @@ public class MovementServiceImpl : IMovementService
             ReferenceId = dto.ReferenceId,
             UnitCost = dto.UnitCost,
             Notes = dto.Notes,
-            MovementDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")),
+            MovementDate = DateTime.UtcNow,
             PerformedBy = performedBy,
             BalanceAfter = dto.BalanceAfter
         };

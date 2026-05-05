@@ -14,7 +14,7 @@ public class StockLevel
 
     public string Location { get; set; }
 
-    public DateTime LastUpdated { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+    public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
 
     [NotMapped]
     public int AvailableQuantity => Quantity - ReservedQuantity;

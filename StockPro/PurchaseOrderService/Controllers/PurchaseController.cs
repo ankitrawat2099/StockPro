@@ -28,7 +28,7 @@ public class PurchaseController : ControllerBase
             Notes = dto.Notes,
             ReferenceNumber = dto.ReferenceNumber,
             Status = "DRAFT",
-            OrderDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")),
+            OrderDate = DateTime.UtcNow,
             TotalAmount = dto.Items.Sum(x => x.Quantity * x.UnitCost)
         };
 

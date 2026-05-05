@@ -22,7 +22,7 @@ public class PurchaseServiceImpl : IPurchaseService
         try
         {
             po.Status = "DRAFT";
-            po.OrderDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            po.OrderDate = DateTime.UtcNow;
 
             await _context.PurchaseOrders.AddAsync(po);
             await _context.SaveChangesAsync();
@@ -179,7 +179,7 @@ public class PurchaseServiceImpl : IPurchaseService
             if (isFull)
             {
                 po.Status = "RECEIVED";
-                po.ReceivedDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                po.ReceivedDate = DateTime.UtcNow;
             }
             else
             {

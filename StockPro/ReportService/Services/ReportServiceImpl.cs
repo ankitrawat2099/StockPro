@@ -30,7 +30,7 @@ public class ReportServiceImpl : IReportService
     {
         Console.WriteLine("START SNAPSHOT");
 
-        var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+        var istNow = DateTime.UtcNow;
         var today = DateOnly.FromDateTime(istNow);
 
         var existing = await _repository.FindBySnapshotDate(today);
@@ -79,7 +79,7 @@ public class ReportServiceImpl : IReportService
     {
         return await SafeAsync(async () =>
         {
-            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var istNow = DateTime.UtcNow;
             var today = DateOnly.FromDateTime(istNow);
             var data = await _repository.FindBySnapshotDate(today);
 
@@ -148,7 +148,7 @@ public class ReportServiceImpl : IReportService
     {
         return await SafeAsync(async () =>
         {
-            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var istNow = DateTime.UtcNow;
             var data = await _repository.FindByDateBetween(
                 DateOnly.FromDateTime(istNow.AddDays(-7)),
                 DateOnly.FromDateTime(istNow)
@@ -163,7 +163,7 @@ public class ReportServiceImpl : IReportService
     {
         return await SafeAsync(async () =>
         {
-            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var istNow = DateTime.UtcNow;
             var data = await _repository.FindByDateBetween(
                 DateOnly.FromDateTime(istNow.AddDays(-7)),
                 DateOnly.FromDateTime(istNow)
@@ -178,7 +178,7 @@ public class ReportServiceImpl : IReportService
     {
         return await SafeAsync(async () =>
         {
-            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var istNow = DateTime.UtcNow;
             var today = DateOnly.FromDateTime(istNow);
 
             var data = await _repository.FindBySnapshotDate(today);
@@ -196,7 +196,7 @@ public class ReportServiceImpl : IReportService
     {
         return await SafeAsync(async () =>
         {
-            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var istNow = DateTime.UtcNow;
             var today = DateOnly.FromDateTime(istNow);
             var data = await _repository.FindBySnapshotDate(today);
 
@@ -212,7 +212,7 @@ public class ReportServiceImpl : IReportService
     {
         return await SafeAsync(async () =>
         {
-            var istNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            var istNow = DateTime.UtcNow;
             var data = await _repository.FindByDateBetween(
                 DateOnly.FromDateTime(istNow.AddDays(-30)),
                 DateOnly.FromDateTime(istNow)

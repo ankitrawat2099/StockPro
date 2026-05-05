@@ -58,7 +58,7 @@ public class AuthServiceImpl : IAuthService
             Role = request.Role?.ToUpper() ?? "STAFF",
             Department = request.Department,
             IsActive = true,
-            CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"))
+            CreatedAt = DateTime.UtcNow
         };
 
         await _context.Users.AddAsync(user);
@@ -97,7 +97,7 @@ public class AuthServiceImpl : IAuthService
         if (!isValid)
             throw new Exception("Invalid email or password");
 
-        user.LastLoginAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+        user.LastLoginAt = DateTime.UtcNow;
         _context.Users.Update(user);
         await _context.SaveChangesAsync();
 

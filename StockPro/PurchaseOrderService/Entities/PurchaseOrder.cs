@@ -20,7 +20,7 @@ public class PurchaseOrder
 
     public double TotalAmount { get; set; }
 
-    public DateTime OrderDate { get; set; } = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+    public DateTime OrderDate { get; set; } = DateTime.UtcNow;
 
     public DateTime? ExpectedDate { get; set; }
 
