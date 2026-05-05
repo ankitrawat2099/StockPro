@@ -10,7 +10,7 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  # Microservices (All changed to 'web' for Free Plan support)
+  # Microservices
   - type: web
     name: auth-service
     runtime: docker
@@ -19,7 +19,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
+        value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -31,7 +31,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
+        value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: Services__WarehouseService
         value: http://warehouse-service:8080
       - key: ASPNETCORE_URLS
@@ -45,7 +45,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
+        value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -57,7 +57,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
+        value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -69,7 +69,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
+        value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: Services__WarehouseService
         value: http://warehouse-service:8080
       - key: ASPNETCORE_URLS
@@ -83,7 +83,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
+        value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -95,7 +95,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
+        value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: WarehouseService__BaseUrl
         value: http://warehouse-service:8080
       - key: ProductService__BaseUrl
@@ -111,7 +111,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
+        value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: WarehouseService__BaseUrl
         value: http://warehouse-service:8080
       - key: ProductService__BaseUrl
