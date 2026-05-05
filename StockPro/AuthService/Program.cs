@@ -84,13 +84,6 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Auto-create database schema
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    db.Database.EnsureCreated();
-}
-
 app.UseCors("AllowReact");
 
 app.UseSwagger();

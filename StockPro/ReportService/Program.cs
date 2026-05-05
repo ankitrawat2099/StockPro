@@ -84,20 +84,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Auto-create database schema
-using (var scope = app.Services.CreateScope())
-{
-    try
-    {
-        var db = scope.ServiceProvider.GetRequiredService<ReportDbContext>();
-        db.Database.EnsureCreated();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Report DB creation failed: {ex.Message}");
-    }
-}
-
 app.UseCors("AllowReact");
 
 

@@ -85,13 +85,6 @@ builder.Services.AddAuthentication("Bearer")
 
 var app = builder.Build();
 
-// Auto-create database schema
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<WarehouseDbContext>();
-    db.Database.EnsureCreated();
-}
-
 app.UseCors("AllowReact");
 
 app.UseSwagger();
