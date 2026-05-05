@@ -1,0 +1,150 @@
+services:
+  # Frontend (Static Site)
+  - type: static
+    name: stockpro-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    publishPath: StockPro_Frontend/dist
+    envVars:
+      - key: VITE_GATEWAY_API
+        value: https://stockpro-gateway.onrender.com
+
+  # API Gateway (Public Web Service)
+  - type: web
+    name: stockpro-gateway
+    env: docker
+    dockerContext: StockPro/ApiGateway
+    dockerfilePath: StockPro/ApiGateway/Dockerfile
+    plan: free
+    envVars:
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+  # Microservices (Private Services)
+  - type: pvt
+    name: auth-service
+    env: docker
+    dockerContext: StockPro/AuthService
+    dockerfilePath: StockPro/AuthService/Dockerfile
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+  - type: pvt
+    name: product-service
+    env: docker
+    dockerContext: StockPro/ProductService
+    dockerfilePath: StockPro/ProductService/Dockerfile
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      - key: Services__WarehouseService
+        value: http://warehouse-service:8080
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+  - type: pvt
+    name: warehouse-service
+    env: docker
+    dockerContext: StockPro/WarehouseService
+    dockerfilePath: StockPro/WarehouseService/Dockerfile
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+  - type: pvt
+    name: supplier-service
+    env: docker
+    dockerContext: StockPro/SupplierService
+    dockerfilePath: StockPro/SupplierService/Dockerfile
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+  - type: pvt
+    name: purchase-order-service
+    env: docker
+    dockerContext: StockPro/PurchaseOrderService
+    dockerfilePath: StockPro/PurchaseOrderService/Dockerfile
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      - key: Services__WarehouseService
+        value: http://warehouse-service:8080
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+  - type: pvt
+    name: movement-service
+    env: docker
+    dockerContext: StockPro/StockMovementService
+    dockerfilePath: StockPro/StockMovementService/Dockerfile
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+  - type: pvt
+    name: alert-service
+    env: docker
+    dockerContext: StockPro/AlertService
+    dockerfilePath: StockPro/AlertService/Dockerfile
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      - key: WarehouseService__BaseUrl
+        value: http://warehouse-service:8080
+      - key: ProductService__BaseUrl
+        value: http://product-service:8080
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+  - type: pvt
+    name: report-service
+    env: docker
+    dockerContext: StockPro/ReportService
+    dockerfilePath: StockPro/ReportService/Dockerfile
+    plan: free
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: stockpro-db
+          property: connectionString
+      - key: WarehouseService__BaseUrl
+        value: http://warehouse-service:8080
+      - key: ProductService__BaseUrl
+        value: http://product-service:8080
+      - key: ASPNETCORE_URLS
+        value: http://*:8080
+
+databases:
+  - name: stockpro-db
+    plan: free
