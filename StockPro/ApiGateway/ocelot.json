@@ -2,11 +2,11 @@
   "Routes": [
     {
       "DownstreamPathTemplate": "/api/auth/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-service",
-          "Port": 8080
+          "Host": "auth-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/auth/{everything}",
@@ -14,11 +14,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/products/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "product-service",
-          "Port": 8080
+          "Host": "product-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/products/{everything}",
@@ -26,11 +26,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/warehouses/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "warehouse-service",
-          "Port": 8080
+          "Host": "warehouse-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/warehouses/{everything}",
@@ -38,11 +38,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/stock/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "warehouse-service",
-          "Port": 8080
+          "Host": "warehouse-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/stock/{everything}",
@@ -50,11 +50,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/suppliers/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "supplier-service",
-          "Port": 8080
+          "Host": "supplier-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/suppliers/{everything}",
@@ -62,11 +62,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/purchase-orders/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "purchase-order-service",
-          "Port": 8080
+          "Host": "purchase-order-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/purchase-orders/{everything}",
@@ -74,11 +74,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/movements/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "movement-service",
-          "Port": 8080
+          "Host": "movement-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/movements/{everything}",
@@ -86,11 +86,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/alerts/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "alert-service",
-          "Port": 8080
+          "Host": "alert-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/alerts/{everything}",
@@ -98,11 +98,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/reports/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "report-service",
-          "Port": 8080
+          "Host": "report-service.onrender.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/reports/{everything}",

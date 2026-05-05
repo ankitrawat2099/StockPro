@@ -33,7 +33,7 @@ services:
       - key: ConnectionStrings__DefaultConnection
         value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: Services__WarehouseService
-        value: http://warehouse-service:8080
+        value: https://warehouse-service.onrender.com
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -71,7 +71,7 @@ services:
       - key: ConnectionStrings__DefaultConnection
         value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: Services__WarehouseService
-        value: http://warehouse-service:8080
+        value: https://warehouse-service.onrender.com
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -97,9 +97,9 @@ services:
       - key: ConnectionStrings__DefaultConnection
         value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: WarehouseService__BaseUrl
-        value: http://warehouse-service:8080
+        value: https://warehouse-service.onrender.com
       - key: ProductService__BaseUrl
-        value: http://product-service:8080
+        value: https://product-service.onrender.com
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -113,8 +113,8 @@ services:
       - key: ConnectionStrings__DefaultConnection
         value: "Host=dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com;Port=5432;Database=stockpro_db_h4wv;Username=stockpro_user;Password=lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS;Pooling=true;TrustServerCertificate=true;"
       - key: WarehouseService__BaseUrl
-        value: http://warehouse-service:8080
+        value: https://warehouse-service.onrender.com
       - key: ProductService__BaseUrl
-        value: http://product-service:8080
+        value: https://product-service.onrender.com
       - key: ASPNETCORE_URLS
         value: http://*:8080
