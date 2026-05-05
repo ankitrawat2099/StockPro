@@ -19,6 +19,9 @@ var app = builder.Build();
 
 app.UseCors("AllowAll");
 
+// Health check for Render
+app.MapGet("/", () => "Gateway is running!");
+
 await app.UseOcelot();
 
 app.Run();
