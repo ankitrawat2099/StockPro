@@ -18,7 +18,6 @@ public class AuthController : ControllerBase
     }
 
     //Register
-    [Authorize(Roles = "ADMIN")]
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
