@@ -5,7 +5,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-service.onrender.com",
+          "Host": "auth-service-7x5q.onrender.com",
           "Port": 443
         }
       ],
@@ -17,7 +17,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "product-service.onrender.com",
+          "Host": "product-service-qxia.onrender.com",
           "Port": 443
         }
       ],
@@ -29,7 +29,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "warehouse-service.onrender.com",
+          "Host": "warehouse-service-f2au.onrender.com",
           "Port": 443
         }
       ],
@@ -41,7 +41,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "warehouse-service.onrender.com",
+          "Host": "warehouse-service-f2au.onrender.com",
           "Port": 443
         }
       ],
@@ -53,7 +53,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "supplier-service.onrender.com",
+          "Host": "supplier-service-316x.onrender.com",
           "Port": 443
         }
       ],
@@ -89,7 +89,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "alert-service.onrender.com",
+          "Host": "alert-service-x1vl.onrender.com",
           "Port": 443
         }
       ],
@@ -101,7 +101,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "report-service.onrender.com",
+          "Host": "report-service-w2ue.onrender.com",
           "Port": 443
         }
       ],
