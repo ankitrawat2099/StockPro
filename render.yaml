@@ -1,10 +1,10 @@
 services:
   # Frontend (Static Site)
-  - type: static
+  - type: web
     name: stockpro-frontend
-    env: static
+    runtime: static
     buildCommand: npm install && npm run build
-    publishPath: StockPro_Frontend/dist
+    staticPublishPath: StockPro_Frontend/dist
     envVars:
       - key: VITE_GATEWAY_API
         value: https://stockpro-gateway.onrender.com
@@ -12,7 +12,7 @@ services:
   # API Gateway (Public Web Service)
   - type: web
     name: stockpro-gateway
-    env: docker
+    runtime: docker
     dockerContext: StockPro/ApiGateway
     dockerfilePath: StockPro/ApiGateway/Dockerfile
     plan: free
@@ -23,7 +23,7 @@ services:
   # Microservices (Private Services)
   - type: pvt
     name: auth-service
-    env: docker
+    runtime: docker
     dockerContext: StockPro/AuthService
     dockerfilePath: StockPro/AuthService/Dockerfile
     plan: free
@@ -37,7 +37,7 @@ services:
 
   - type: pvt
     name: product-service
-    env: docker
+    runtime: docker
     dockerContext: StockPro/ProductService
     dockerfilePath: StockPro/ProductService/Dockerfile
     plan: free
@@ -53,7 +53,7 @@ services:
 
   - type: pvt
     name: warehouse-service
-    env: docker
+    runtime: docker
     dockerContext: StockPro/WarehouseService
     dockerfilePath: StockPro/WarehouseService/Dockerfile
     plan: free
@@ -67,7 +67,7 @@ services:
 
   - type: pvt
     name: supplier-service
-    env: docker
+    runtime: docker
     dockerContext: StockPro/SupplierService
     dockerfilePath: StockPro/SupplierService/Dockerfile
     plan: free
@@ -81,7 +81,7 @@ services:
 
   - type: pvt
     name: purchase-order-service
-    env: docker
+    runtime: docker
     dockerContext: StockPro/PurchaseOrderService
     dockerfilePath: StockPro/PurchaseOrderService/Dockerfile
     plan: free
@@ -97,7 +97,7 @@ services:
 
   - type: pvt
     name: movement-service
-    env: docker
+    runtime: docker
     dockerContext: StockPro/StockMovementService
     dockerfilePath: StockPro/StockMovementService/Dockerfile
     plan: free
@@ -111,7 +111,7 @@ services:
 
   - type: pvt
     name: alert-service
-    env: docker
+    runtime: docker
     dockerContext: StockPro/AlertService
     dockerfilePath: StockPro/AlertService/Dockerfile
     plan: free
@@ -129,7 +129,7 @@ services:
 
   - type: pvt
     name: report-service
-    env: docker
+    runtime: docker
     dockerContext: StockPro/ReportService
     dockerfilePath: StockPro/ReportService/Dockerfile
     plan: free
