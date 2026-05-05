@@ -19,9 +19,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: stockpro-db
-          property: connectionString
+        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -33,9 +31,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: stockpro-db
-          property: connectionString
+        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
       - key: Services__WarehouseService
         value: http://warehouse-service:8080
       - key: ASPNETCORE_URLS
@@ -49,9 +45,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: stockpro-db
-          property: connectionString
+        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -63,9 +57,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: stockpro-db
-          property: connectionString
+        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -77,9 +69,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: stockpro-db
-          property: connectionString
+        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
       - key: Services__WarehouseService
         value: http://warehouse-service:8080
       - key: ASPNETCORE_URLS
@@ -93,9 +83,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: stockpro-db
-          property: connectionString
+        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
@@ -107,9 +95,7 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: stockpro-db
-          property: connectionString
+        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
       - key: WarehouseService__BaseUrl
         value: http://warehouse-service:8080
       - key: ProductService__BaseUrl
@@ -125,16 +111,10 @@ services:
     plan: free
     envVars:
       - key: ConnectionStrings__DefaultConnection
-        fromDatabase:
-          name: stockpro-db
-          property: connectionString
+        value: postgresql://stockpro_user:lt4tX1BWS8LoCdykbMNmKrRYM7LGQWkS@dpg-d7t1kdv7f7vs73dgjuvg-a.ohio-postgres.render.com/stockpro_db_h4wv
       - key: WarehouseService__BaseUrl
         value: http://warehouse-service:8080
       - key: ProductService__BaseUrl
         value: http://product-service:8080
       - key: ASPNETCORE_URLS
         value: http://*:8080
-
-databases:
-  - name: stockpro-db
-    plan: free
