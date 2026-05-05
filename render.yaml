@@ -10,8 +10,8 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  # Microservices (Private Services)
-  - type: pserv
+  # Microservices (All changed to 'web' for Free Plan support)
+  - type: web
     name: auth-service
     runtime: docker
     dockerContext: StockPro/AuthService
@@ -23,7 +23,7 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  - type: pserv
+  - type: web
     name: product-service
     runtime: docker
     dockerContext: StockPro/ProductService
@@ -37,7 +37,7 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  - type: pserv
+  - type: web
     name: warehouse-service
     runtime: docker
     dockerContext: StockPro/WarehouseService
@@ -49,7 +49,7 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  - type: pserv
+  - type: web
     name: supplier-service
     runtime: docker
     dockerContext: StockPro/SupplierService
@@ -61,7 +61,7 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  - type: pserv
+  - type: web
     name: purchase-order-service
     runtime: docker
     dockerContext: StockPro/PurchaseOrderService
@@ -75,7 +75,7 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  - type: pserv
+  - type: web
     name: movement-service
     runtime: docker
     dockerContext: StockPro/StockMovementService
@@ -87,7 +87,7 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  - type: pserv
+  - type: web
     name: alert-service
     runtime: docker
     dockerContext: StockPro/AlertService
@@ -103,7 +103,7 @@ services:
       - key: ASPNETCORE_URLS
         value: http://*:8080
 
-  - type: pserv
+  - type: web
     name: report-service
     runtime: docker
     dockerContext: StockPro/ReportService
