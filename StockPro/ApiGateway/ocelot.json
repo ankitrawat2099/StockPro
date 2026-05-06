@@ -10,7 +10,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/auth/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     },
     {
       "DownstreamPathTemplate": "/api/products/{everything}",
@@ -22,7 +29,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/products/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     },
     {
       "DownstreamPathTemplate": "/api/warehouses/{everything}",
@@ -34,7 +48,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/warehouses/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     },
     {
       "DownstreamPathTemplate": "/api/stock/{everything}",
@@ -46,7 +67,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/stock/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     },
     {
       "DownstreamPathTemplate": "/api/suppliers/{everything}",
@@ -58,7 +86,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/suppliers/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     },
     {
       "DownstreamPathTemplate": "/api/purchase-orders/{everything}",
@@ -70,7 +105,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/purchase-orders/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     },
     {
       "DownstreamPathTemplate": "/api/movements/{everything}",
@@ -82,7 +124,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/movements/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     },
     {
       "DownstreamPathTemplate": "/api/alerts/{everything}",
@@ -94,7 +143,14 @@
         }
       ],
       "UpstreamPathTemplate": "/api/alerts/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     },
     {
       "DownstreamPathTemplate": "/api/reports/{everything}",
@@ -106,10 +162,23 @@
         }
       ],
       "UpstreamPathTemplate": "/api/reports/{everything}",
-      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ]
+      "UpstreamHttpMethod": [ "Get", "Post", "Put", "Delete", "Options" ],
+      "HttpHandlerOptions": {
+        "AllowAutoRedirect": false,
+        "UseCookieContainer": false,
+        "UseTracing": false
+      },
+      "DownstreamHttpVersion": "1.1",
+      "Timeout": 90000
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "https://stockpro-gateway.onrender.com"
+    "BaseUrl": "https://stockpro-gateway.onrender.com",
+    "RequestIdKey": "OcRequestId",
+    "HttpHandlerOptions": {
+      "AllowAutoRedirect": false,
+      "UseCookieContainer": false,
+      "UseTracing": false
+    }
   }
 }
