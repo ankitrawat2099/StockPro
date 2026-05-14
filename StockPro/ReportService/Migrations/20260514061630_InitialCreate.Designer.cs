@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ReportService.Migrations
 {
     [DbContext(typeof(ReportDbContext))]
-    [Migration("20260505170416_InitialCreate")]
+    [Migration("20260514061630_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
