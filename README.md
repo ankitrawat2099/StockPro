@@ -192,7 +192,6 @@ graph TD
 ## Data Architecture (ER Diagram)
 
 This section provides a logical Entity-Relationship (ER) diagram for the StockPro system. 
-**Note:** Because StockPro uses a Database-per-Service architecture, these entities actually live in physically separate SQL Server databases. The relationships mapped here (like `PurchaseOrder` -> `Supplier`) are "logical" relationships that your microservices handle programmatically via IDs.
 
 ```mermaid
 erDiagram
@@ -218,8 +217,8 @@ erDiagram
         string Category
         string Brand
         string UnitOfMeasure
-        float CostPrice
-        float SellingPrice
+        double CostPrice
+        double SellingPrice
         int ReorderLevel
         int MaxStockLevel
         int LeadTimeDays
@@ -240,7 +239,7 @@ erDiagram
         string TaxId
         string PaymentTerms
         int LeadTimeDays
-        float Rating
+        double Rating
         boolean IsActive
     }
 
@@ -249,7 +248,7 @@ erDiagram
         string Name
         string Location
         string Address
-        int ManagerId FK
+        int ManagerId
         int Capacity
         int UsedCapacity
         boolean IsActive
@@ -275,7 +274,7 @@ erDiagram
         int Quantity
         string ReferenceType
         int ReferenceId
-        float UnitCost
+        double UnitCost
         uniqueidentifier PerformedBy FK
         string Notes
         datetime MovementDate
@@ -288,7 +287,7 @@ erDiagram
         int WarehouseId FK
         uniqueidentifier CreatedById FK
         string Status
-        float TotalAmount
+        double TotalAmount
         datetime OrderDate
         datetime ExpectedDate
         datetime ReceivedDate
@@ -301,8 +300,8 @@ erDiagram
         int PoId FK
         uniqueidentifier ProductId FK
         int Quantity
-        float UnitCost
-        float TotalCost
+        double UnitCost
+        double TotalCost
         int ReceivedQty
     }
 
@@ -311,14 +310,14 @@ erDiagram
         int WarehouseId FK
         uniqueidentifier ProductId FK
         int Quantity
-        float StockValue
+        double StockValue
         date SnapshotDate
         datetime CreatedAt
     }
 
     ALERT {
         int AlertId PK
-        int RecipientId FK
+        int RecipientId
         string Type
         string Severity
         string Title
@@ -350,7 +349,7 @@ erDiagram
     
     PRODUCT ||--o{ ALERT : "triggers"
     WAREHOUSE ||--o{ ALERT : "triggers"
-
+```
 
 ## Services
 
