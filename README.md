@@ -137,6 +137,56 @@ graph TD
     DB_CTX --> DB[(SQL Server<br/>PurchaseDB)]
 ```
 
+### 4. Warehouse Service Flow
+```mermaid
+graph TD
+    Router[HTTP Request] --> C[Controllers<br/>WarehouseController.cs]
+    C --> S[Services<br/>WarehouseService.cs]
+    S --> R[Repositories<br/>WarehouseRepository.cs]
+    R --> DB_CTX[Data<br/>WarehouseDbContext.cs]
+    DB_CTX --> DB[(SQL Server<br/>WarehouseDB)]
+```
+
+### 5. Stock Movement Service Flow
+```mermaid
+graph TD
+    Router[HTTP Request] --> C[Controllers<br/>StockMovementController.cs]
+    C --> S[Services<br/>StockMovementService.cs]
+    S --> R[Repositories<br/>StockMovementRepository.cs]
+    R --> DB_CTX[Data<br/>StockMovementDbContext.cs]
+    DB_CTX --> DB[(SQL Server<br/>MovementDB)]
+```
+
+### 6. Supplier Service Flow
+```mermaid
+graph TD
+    Router[HTTP Request] --> C[Controllers<br/>SupplierController.cs]
+    C --> S[Services<br/>SupplierService.cs]
+    S --> R[Repositories<br/>SupplierRepository.cs]
+    R --> DB_CTX[Data<br/>SupplierDbContext.cs]
+    DB_CTX --> DB[(SQL Server<br/>SupplierDB)]
+```
+
+### 7. Alert Service Flow
+```mermaid
+graph TD
+    Router[HTTP Request] --> C[Controllers<br/>AlertController.cs]
+    C --> S[Services<br/>AlertService.cs]
+    S --> R[Repositories<br/>AlertRepository.cs]
+    R --> DB_CTX[Data<br/>AlertDbContext.cs]
+    DB_CTX --> DB[(SQL Server<br/>AlertDB)]
+```
+
+### 8. Report Service Flow
+```mermaid
+graph TD
+    Router[HTTP Request] --> C[Controllers<br/>ReportController.cs]
+    C --> S[Services<br/>ReportService.cs]
+    S --> R[Repositories<br/>ReportRepository.cs]
+    R --> DB_CTX[Data<br/>ReportDbContext.cs]
+    DB_CTX --> DB[(SQL Server<br/>ReportDB)]
+```
+
 ---
 
 ## Data Architecture (ER Diagram)
@@ -300,16 +350,7 @@ erDiagram
     
     PRODUCT ||--o{ ALERT : "triggers"
     WAREHOUSE ||--o{ ALERT : "triggers"
-```
 
-### Schema Observations & Potential Bugs Noticed
-While generating this diagram from your Entity classes, I noticed a few **data type mismatches** for foreign keys across microservices that might cause bugs when you try to join data:
-1. `AppUser.UserId` is a `Guid`, but `Warehouse.ManagerId` is an `int`.
-2. `AppUser.UserId` is a `Guid`, but `Alert.RecipientId` is an `int`.
-
-You might want to update `ManagerId` and `RecipientId` to be `Guid` properties so they properly map to the Auth Service's `UserId`.
-
----
 
 ## Services
 
@@ -338,95 +379,7 @@ You might want to update `ManagerId` and `RecipientId` to be `Guid` properties s
 
 ---
 
-## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- SQL Server or SQL Server Express
-- Git
-
----
-
-## Getting Started
-
-### 1. Clone the repository
-
-```bash
-git clone <repository-url>
-cd StockPro
-```
-
-### 2. Configure connection strings
-
-Each service has its own `appsettings.json`. Update the `DefaultConnection` string to point to your SQL Server instance.
-
-**Example** (`AuthService/appsettings.json`):
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=AuthDB;Trusted_Connection=True;TrustServerCertificate=True;"
-  },
-  "Jwt": {
-    "Key": "YOUR_SECRET_KEY_HERE",
-    "Issuer": "StockPro",
-    "Audience": "StockProUsers"
-  }
-}
-```
-
-Repeat for each service, using a separate database name per service (e.g., `ProductDB`, `WarehouseDB`, etc.).
-
-### 3. Run database migrations
-
-Run migrations for each service from the solution root:
-
-```bash
-dotnet ef database update --project AuthService
-dotnet ef database update --project ProductService
-dotnet ef database update --project WarehouseService
-dotnet ef database update --project StockMovementService
-dotnet ef database update --project SupplierService
-dotnet ef database update --project PurchaseOrderService
-dotnet ef database update --project AlertService
-dotnet ef database update --project ReportService
-```
-
-### 4. Start all services
-
-Open a terminal for each service and run:
-
-```bash
-dotnet run --project ApiGateway
-dotnet run --project AuthService
-dotnet run --project ProductService
-dotnet run --project WarehouseService
-dotnet run --project StockMovementService
-dotnet run --project SupplierService
-dotnet run --project PurchaseOrderService
-dotnet run --project AlertService
-dotnet run --project ReportService
-```
-
-All client traffic should be routed through the gateway at `http://localhost:5000`.
-
----
-
-## API Documentation
-
-Each service exposes a Swagger UI at:
-
-```
-http://localhost:{PORT}/swagger
-```
-
-All secured endpoints require a **Bearer JWT token** in the `Authorization` header:
-
-```
-Authorization: Bearer <your_token>
-```
-
-Obtain a token via `POST /api/auth/login` through the gateway.
-
----
 
 ## Authentication & Authorization
 
