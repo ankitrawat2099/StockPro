@@ -6,162 +6,85 @@
 
 ## System Use Case Diagram
 
-Based on the explicit Role-Based Access Control (RBAC) rules (ADMIN, MANAGER, OFFICER, STAFF), the following diagram maps out the primary actors and the operations they are authorized to perform.
+The following diagram outlines the overarching use cases across the entire StockPro platform, mapping all system actors (Admin, Manager, Officer, Staff, System) to their respective capabilities.
 
 ```mermaid
-flowchart LR
-    %% Actors
-    Admin((👤 Admin))
-    Manager((👨‍💼 Manager))
-    Officer((🏢 Officer))
-    Staff((👷 Staff))
-    System((⚙️ System Worker))
+graph TD
+    Admin[Admin]
+    Manager[Manager]
+    Officer[Officer]
+    Staff[Staff]
+    System[System Worker]
 
-    %% System Boundary
-    subgraph "StockPro System Boundary"
-        direction TB
-        
-        %% Use Cases
-        UC_Users([Manage Users & Access])
-        
-        UC_Products([Manage Products])
-        UC_Reports([Generate Reports])
-        UC_Movements([Review Stock Movements])
-        UC_Alerts([Receive Low Stock Alerts])
-        
-        UC_Suppliers([Manage Suppliers])
-        UC_PO([Create & Approve Purchase Orders])
-        
-        UC_Warehouses([Manage Warehouses])
-        UC_Stock([Log Stock Movements])
-        UC_Receive([Receive Goods from PO])
-        
-        UC_Monitor([Monitor Inventory Levels])
-    end
+    Admin --> Users[Manage Users & Access]
+    Admin --> Warehouses[Manage Warehouses]
+    Admin --> Movements[Review Stock Movements]
 
-    %% Admin Links
-    Admin --> UC_Users
-    Admin --> UC_Warehouses
-    Admin --> UC_Movements
+    Manager --> Products[Manage Products]
+    Manager --> Reports[Generate Reports]
+    Manager -.-> Alerts[Receive Low Stock Alerts]
 
-    %% Manager Links
-    Manager --> UC_Products
-    Manager --> UC_Reports
-    Manager --> UC_Movements
-    Manager -.->|Is Notified By| UC_Alerts
+    Officer --> Suppliers[Manage Suppliers]
+    Officer --> PO[Create & Approve Purchase Orders]
 
-    %% Officer Links
-    Officer --> UC_Suppliers
-    Officer --> UC_PO
-    
-    %% Staff Links
-    Staff --> UC_Stock
-    Staff --> UC_Receive
-    Staff -->|Views| UC_Warehouses
+    Staff --> Stock[Log Stock Movements]
+    Staff --> Receive[Receive Goods from PO]
 
-    %% System Background Links
-    System --> UC_Monitor
-    UC_Monitor -.->|Triggers| UC_Alerts
-
-    %% Apply basic styling
-    classDef actor fill:#e2e8f0,stroke:#64748b,stroke-width:2px,color:#0f172a
-    classDef usecase fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e3a8a
-    
-    class Admin,Manager,Officer,Staff,System actor
-    class UC_Users,UC_Products,UC_Reports,UC_Movements,UC_Alerts,UC_Suppliers,UC_PO,UC_Warehouses,UC_Stock,UC_Receive,UC_Monitor usecase
+    System --> Monitor[Monitor Inventory Levels]
+    Monitor -.-> Alerts
 ```
-
-### Role Authorization Breakdown:
-* **Admin:** Has system-wide access, including creating users and defining core infrastructure like warehouses.
-* **Manager:** Primarily handles analytics, product catalogs, and receives alerts when stock dips below safe thresholds.
-* **Officer:** Focused on procurement. They define suppliers and draft/approve Purchase Orders.
-* **Staff:** The boots-on-the-ground warehouse workers. They physically receive goods and log ad-hoc stock movements.
-* **System Worker:** The automated `AlertService` background job that monitors inventory levels seamlessly.
 
 ---
 
 ## Microservices Architecture & Connectivity
 
-StockPro is structured as a collection of independent microservices, each owning its own database and exposed through a unified API Gateway.
-
 ```mermaid
 graph TD
-    %% Define Styles
-    classDef client fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0f172a;
-    classDef gateway fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#422006;
-    classDef service fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d;
-    classDef worker fill:#cffafe,stroke:#06b6d4,stroke-width:2px,color:#164e63;
-    classDef database fill:#f3e8ff,stroke:#9333ea,stroke-width:2px,color:#3b0764;
+    Client[Client Frontend]
 
-    %% Client Layer
-    Client["📱 Client Applications<br/>(React SPA)"]:::client
+    subgraph "StockPro Microservices (.NET 8)"
+        ApiGateway[API Gateway<br/>:5000]
+        Auth[Auth Service<br/>:5119]
+        Product[Product Service<br/>:5212]
+        Warehouse[Warehouse Service<br/>:5019]
+        StockMovement[StockMovement Service<br/>:5121]
+        Supplier[Supplier Service<br/>:5230]
+        PurchaseOrder[PurchaseOrder Service<br/>:5189]
+        Alert[Alert Service<br/>:5245]
+        Report[Report Service<br/>:5144]
+    end
+
+    subgraph "Databases (SQL Server)"
+        DB_Auth[(Auth DB)]
+        DB_Product[(Product DB)]
+        DB_Warehouse[(Warehouse DB)]
+        DB_StockMovement[(Movement DB)]
+        DB_Supplier[(Supplier DB)]
+        DB_PurchaseOrder[(Purchase DB)]
+        DB_Alert[(Alert DB)]
+        DB_Report[(Report DB)]
+    end
+
+    Client --> ApiGateway
     
-    %% API Gateway Layer
-    Client -->|HTTP Requests| API_GW{"🛡️ API Gateway<br/>(Ocelot)"}:::gateway
+    ApiGateway --> Auth
+    ApiGateway --> Product
+    ApiGateway --> Warehouse
+    ApiGateway --> StockMovement
+    ApiGateway --> Supplier
+    ApiGateway --> PurchaseOrder
+    ApiGateway --> Alert
+    ApiGateway --> Report
 
-    %% Microservices Layer
-    subgraph "Microservices Cluster"
-        direction TB
-        
-        AuthSvc["🔐 Auth Service"]:::service
-        ProductSvc["📦 Product Service"]:::service
-        WarehouseSvc["🏭 Warehouse & Stock Service"]:::service
-        MovementSvc["🚚 Stock Movement Service"]:::service
-        SupplierSvc["🤝 Supplier Service"]:::service
-        POSvc["🛒 Purchase Order Service"]:::service
-        ReportSvc["📊 Report Service"]:::service
-        AlertSvc["⚠️ Alert Service<br/>(Background Worker)"]:::worker
-
-        %% Gateway Routing
-        API_GW -->|"/api/auth/*"| AuthSvc
-        API_GW -->|"/api/products/*"| ProductSvc
-        API_GW -->|"/api/warehouses/*<br/>/api/stock/*"| WarehouseSvc
-        API_GW -->|"/api/movements/*"| MovementSvc
-        API_GW -->|"/api/suppliers/*"| SupplierSvc
-        API_GW -->|"/api/purchase-orders/*"| POSvc
-        API_GW -->|"/api/reports/*"| ReportSvc
-        API_GW -->|"/api/alerts/*"| AlertSvc
-
-        %% Synchronous HTTP Inter-service communication
-        WarehouseSvc -.->|"POST /api/movements"| MovementSvc
-        POSvc -.->|"POST /api/stock/update"| WarehouseSvc
-        ProductSvc -.->|"GET /api/stock/all"| WarehouseSvc
-        ReportSvc -.->|"GET /api/stock/all"| WarehouseSvc
-        ReportSvc -.->|"GET /api/products/[id]"| ProductSvc
-        AlertSvc -.->|"GET /api/stock/all<br/>GET /api/warehouses/[id]"| WarehouseSvc
-        AlertSvc -.->|"GET /api/products/[id]"| ProductSvc
-    end
-
-    %% Database Layer
-    subgraph "Data Storage (SQL Server)"
-        direction LR
-        AuthDB[("🗄️ Auth DB")]:::database
-        ProductDB[("🗄️ Product DB")]:::database
-        WarehouseDB[("🗄️ Warehouse DB")]:::database
-        MovementDB[("🗄️ Movement DB")]:::database
-        SupplierDB[("🗄️ Supplier DB")]:::database
-        PODB[("🗄️ Purchase DB")]:::database
-        ReportDB[("🗄️ Report DB")]:::database
-        AlertDB[("🗄️ Alert DB")]:::database
-    end
-
-    %% Service to DB connections
-    AuthSvc ===> AuthDB
-    ProductSvc ===> ProductDB
-    WarehouseSvc ===> WarehouseDB
-    MovementSvc ===> MovementDB
-    SupplierSvc ===> SupplierDB
-    POSvc ===> PODB
-    ReportSvc ===> ReportDB
-    AlertSvc ===> AlertDB
-
+    Auth --> DB_Auth
+    Product --> DB_Product
+    Warehouse --> DB_Warehouse
+    StockMovement --> DB_StockMovement
+    Supplier --> DB_Supplier
+    PurchaseOrder --> DB_PurchaseOrder
+    Alert --> DB_Alert
+    Report --> DB_Report
 ```
-
-### Key Architectural Characteristics
-* **API Gateway Pattern:** All external traffic is routed through the Ocelot API Gateway which forwards requests to specific services based on URL prefixes.
-* **Database-per-Service:** Each microservice manages its own separate SQL Server database, ensuring loose coupling and isolated data domains.
-* **Synchronous Communication:** Services communicate with each other over HTTP using `HttpClient` instead of an asynchronous message broker (like RabbitMQ or Kafka).
-* **Background Processing:** The `AlertService` contains a background worker that periodically polls other services to check for low stock thresholds.
 
 Each service follows a consistent layered structure:
 
@@ -179,93 +102,39 @@ ServiceName/
 
 ---
 
-## Microservice Internal Workflows (Service Flows)
+## Microservice Internal Workflows (File-to-File Flow)
 
-To visualize how the microservices communicate with one another to accomplish business goals, here are the Sequence Diagrams for the two most complex cross-service flows in the system.
+The following diagrams illustrate the internal execution flow of files within each microservice when an API request is received. The architecture follows a strict Controller -> Service -> Repository -> Database pattern to ensure separation of concerns.
 
-### 1. Flow 1: Receiving Goods for a Purchase Order
-When a warehouse manager receives items for an approved Purchase Order, the system must update the PO, update the actual warehouse stock, and log a stock movement record. This involves synchronous communication across **three different microservices**.
-
+### 1. Auth Service Flow
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor Client
-    participant API_GW as API Gateway
-    participant POSvc as Purchase Order Service
-    participant PODB as Purchase DB
-    participant WhSvc as Warehouse Service
-    participant WhDB as Warehouse DB
-    participant MovSvc as Stock Movement Service
-    participant MovDB as Movement DB
-
-    Client->>API_GW: POST /api/purchase-orders/{id}/receive
-    API_GW->>POSvc: Route request to POSvc
-    
-    POSvc->>PODB: Begin SQL Transaction
-    POSvc->>PODB: Fetch PO & Line Items
-    PODB-->>POSvc: Return PO data
-    
-    loop For Each Received Item
-        %% Step 5
-        POSvc->>WhSvc: POST /api/stock/update
-        Note over POSvc,WhSvc: Sends: productId, warehouseId, quantity
-        
-        WhSvc->>WhDB: Increment Available Quantity
-        
-        %% Step 7
-        WhSvc->>MovSvc: POST /api/movements
-        Note over WhSvc,MovSvc: Logs a "STOCK_IN" movement
-        
-        MovSvc->>MovDB: Save Movement Log
-        MovDB-->>MovSvc: Saved
-        MovSvc-->>WhSvc: 201 Created
-        
-        WhSvc-->>POSvc: 200 OK (Stock Updated)
-        
-        POSvc->>PODB: Update POLineItem ReceivedQty
-    end
-    
-    alt All Items Fully Received?
-        POSvc->>PODB: Update PO Status to "RECEIVED"
-    else Partially Received
-        POSvc->>PODB: Update PO Status to "PARTIALLY_RECEIVED"
-    end
-    
-    POSvc->>PODB: Commit SQL Transaction
-    POSvc-->>API_GW: 200 OK
-    API_GW-->>Client: Success Response
+graph TD
+    Router[HTTP Request] --> C[Controllers<br/>AuthController.cs]
+    C --> S[Services<br/>AuthService.cs]
+    S --> R[Repositories<br/>UserRepository.cs]
+    R --> DB_CTX[Data<br/>AuthDbContext.cs]
+    DB_CTX --> DB[(SQL Server<br/>AuthDB)]
 ```
 
-### 2. Flow 2: Low Stock Alert Background Job
-The `AlertService` contains a background worker (`LowStockWorker.cs`) that runs periodically to check if any products have dipped below their defined reorder levels.
-
+### 2. Product Service Flow
 ```mermaid
-sequenceDiagram
-    autonumber
-    participant Worker as AlertService (Worker)
-    participant WhSvc as Warehouse Service
-    participant ProdSvc as Product Service
-    participant AlertDB as Alert DB
+graph TD
+    Router[HTTP Request] --> C[Controllers<br/>ProductController.cs]
+    C --> S[Services<br/>ProductService.cs]
+    S --> R[Repositories<br/>ProductRepository.cs]
+    R --> DB_CTX[Data<br/>ProductDbContext.cs]
+    DB_CTX --> DB[(SQL Server<br/>ProductDB)]
+```
 
-    loop Triggered by Timer
-        Worker->>WhSvc: GET /api/stock/all
-        WhSvc-->>Worker: Return list of all StockLevels
-        
-        loop For each StockLevel
-            Worker->>ProdSvc: GET /api/products/{id}
-            ProdSvc-->>Worker: Return Product details
-            
-            opt If AvailableQuantity <= Product.ReorderLevel
-                Worker->>WhSvc: GET /api/warehouses/{id}
-                WhSvc-->>Worker: Return Warehouse details
-                Note over Worker,WhSvc: Needed to find the ManagerId
-                
-                Worker->>AlertDB: Create "LOW_STOCK" Alert
-                Note over Worker,AlertDB: RecipientId = Warehouse.ManagerId
-                AlertDB-->>Worker: Alert Saved
-            end
-        end
-    end
+### 3. Purchase Order Service Flow
+```mermaid
+graph TD
+    Router[HTTP Request] --> C[Controllers<br/>PurchaseOrderController.cs]
+    C --> S[Services<br/>PurchaseOrderService.cs]
+    S --> HTTP[HTTP Clients<br/>WarehouseHttpClient.cs]
+    S --> R[Repositories<br/>PurchaseOrderRepository.cs]
+    R --> DB_CTX[Data<br/>PurchaseOrderDbContext.cs]
+    DB_CTX --> DB[(SQL Server<br/>PurchaseDB)]
 ```
 
 ---
